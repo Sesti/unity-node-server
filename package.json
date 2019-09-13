@@ -11,12 +11,15 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.0",
+    "chalk": "^2.4.2",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "https": "^1.0.0",
     "request": "^2.88.0"
   },
   "nodemonConfig": {
-    "ignore": ["data/"]
+    "ignore": [
+      "data/"
+    ]
   }
 }

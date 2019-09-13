@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const https = require('https');
 const axios = require('axios');
 const fs = require('fs');
+const chalk = require('chalk');
 
 const updateTime = 300000;
 const weatherUrl = `http://api.openweathermap.org/data/2.5/weather?id=${process.env.WEATHER_CITY_ID}&APPID=${process.env.WEATHER_API_KEY}&units=metric`;
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 if (!fs.existsSync('data')){
     fs.mkdir('data', null, (err) => {
         if (err) throw err;
+        console.log(chalk.magentaBright('[File] Directory data created'));
     });
 }
 
@@ -25,9 +27,10 @@ if (!fs.existsSync('data')){
  * Router
  *************/
 app.get('/api/v1/weather', (req, res) => {
-    fs.readFileSync('data/weather.json', (err, data) => {
+
+    fs.readFile(__dirname+'/data/weather.json', 'utf-8', (err, data) => {
         if (err) throw err;
-        res.send('hey');
+        res.json(JSON.parse(data));
     });
 });
 
@@ -37,6 +40,9 @@ app.get('/api/v1/weather', (req, res) => {
 const fetchWeather = () => {
     axios.get(weatherUrl)
     .then((res) => {
+
+        console.log(chalk.yellowBright('[Fetch] Weather data fetched'));
+
         const data = res.data;
 
         const weathers = [];
@@ -72,11 +78,11 @@ const fetchWeather = () => {
 
         fs.writeFile('data/weather.json', content, (err) => {
             if (err) throw err;
+            console.log(chalk.magentaBright("[File] File weather.json written"));
         });
-        console.log('fetched weather');
     })
     .catch((error) => {
-        console.log(error);
+        console.log(chalk.red(error));
     })
 };
 
@@ -90,5 +96,5 @@ setInterval(() => fetchWeather , updateTime);
  * Runtime
  *************/
 app.listen(process.env.PORT, () =>
-    console.log(`Example app listening on port ${process.env.PORT}!`),
+    console.log(`Unity server listening on port ${process.env.PORT}!`),
 );
