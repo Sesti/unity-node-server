@@ -7,7 +7,7 @@ This is the server receiving API request from "Unity Client" and sending back a 
 Copy the server source from the git
 
 ```
-Coming soon...
+https://github.com/Sesti/unity-node-server.git
 ```
 
 Run `npm`
