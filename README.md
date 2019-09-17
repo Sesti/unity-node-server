@@ -16,6 +16,8 @@ Run `npm`
 npm install
 ```
 
+Now, you need to fill in the variable in the .env file with your API keys.
+
 Finally, start the server
 
 ```
