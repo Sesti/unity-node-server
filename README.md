@@ -22,4 +22,3 @@ Finally, start the server
 npm start
 ```
 
-You can use tool like Forever to keep the server running.
