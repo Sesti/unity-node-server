@@ -3,7 +3,7 @@ import WidgetTitle from './WidgetTitle.js';
 import "./NewsModule.css";
 
 class NewsModule extends Component {
-	
+		
 	constructor(props){
 		super( props );
 		this.state = {
