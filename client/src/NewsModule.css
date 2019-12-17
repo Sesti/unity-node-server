@@ -1,3 +1,36 @@
+.widget-news{
+    background-size:cover;
+    background-position:center;
+}
+.widget-news > *{
+    z-index:2;
+    position:relative;
+}
+.widget-news .widget-overlay{
+    content:"";
+    background:rgba(0,0,0,0.3);
+    position: absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:1;
+}
+.widget-news h3{
+    font-size:15px;
+    color:#FFF;
+    margin-top:5px;
+}
+.widget-news p{
+    color:#CCC;
+}
+.widget-news span{
+    color: #CBCBCB;
+    opacity: 0.7;    
+    position: absolute;
+    bottom: 2%;
+    right: 2%;
+}
 .module-news h2{
     margin-top:0;
     font-size:2vw;

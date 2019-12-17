@@ -40,7 +40,7 @@ class NewsModule extends Component {
                     description : json.description._text,
                     url : json.mediaContent._attributes.url,
                 } 
-				context.setState( {data: obj, backgroundStyle: { backgroundImage : "url("+obj.url+")"}} );
+				context.setState( {data: obj} );
 			} );
 	}
 	
@@ -62,12 +62,12 @@ class NewsModule extends Component {
 		console.log(backgroundStyle);
 		
 		return (
-			<div className="App-widget App-widget-1-2" backgroundimage={backgroundStyle.backgroundImage}>
+			<div className="App-widget App-widget-1-2 widget-news" style={{backgroundImage: 'url('+url+')'}}>
+				<div className="widget-overlay"></div>
 				<WidgetTitle name="News"/>
-				<div>{title}</div>
-				<div>{description}</div>
-				<div>{pubDate}</div>
-				<div><img src={url} /></div>
+				<h3>{title}</h3>
+				<p>{description}</p>
+				<span>{pubDate}</span>
 			</div>
 		);
 	}
