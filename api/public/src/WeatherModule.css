@@ -1,0 +1,42 @@
+.temperature-container{
+    display:flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-top:-4vh;
+    padding:0 13vh;
+}
+.temperature{
+    text-align:center;
+    font-size: 6vw;
+}
+.temperature-alt:first-of-type{
+    padding-right: 3vh;
+}
+.temperature-alt{
+    color:#AAA;
+    font-weight:300;
+    font-size: 2vw;
+}
+.weather{
+    font-size:2vw;
+    text-align:center;
+}
+.city{
+    text-align: center;
+    font-size: 1.6vw;
+    margin: 1.5vh;
+    color: #CCC;
+}
+.weather_mod {
+    padding: 40px 0;
+}
+.weather-icon-container {
+    text-align:center;
+}
+.weather-icon{
+    background-image: linear-gradient(to right, #fa709a 0%, #fee140 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 4vw;
+    line-height: 7vw;
+}
