@@ -1,7 +1,21 @@
 import React, { Component } from 'react';
-import WidgetTitle from '../WidgetTitle.js';
+import ModuleTitle from '../../ModulesComponents/ModuleTitle';
+import ModuleElement from '../../ModulesComponents/ModuleElement';
+import ModuleBody from '../../ModulesComponents/ModuleBody';
 import WeatherIcon from 'react-icons-weather';
+import styled from 'styled-components';
 import "./WeatherModule.css";
+
+const StyledModuleElement = styled(ModuleElement)`
+    background: #2193b0;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #6dd5ed, #2193b0);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #6dd5ed, #2193b0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+`;
 
 class WeatherModule extends Component {
 	
@@ -93,10 +107,30 @@ class WeatherModule extends Component {
             weatherDescription, weatherMain, windDegrees, windSpeed, city } = this.state.data;
         const iconId = weatherId === "" ? "200" : weatherId.toString();
         
-        if(this.state.isOpened){
+        /*
+        if(!this.state.isOpened){
+            */
+            return (
+                // <div className="App-widget App-widget-1-4 widget-meteo" onClick={this.openWidget}>
+                <StyledModuleElement size="1_4">
+                    <ModuleTitle color="#FFF" name="Meteo"/>
+                    <ModuleBody>
+                        <WeatherIcon name="owm" className="weather-icon" iconId={iconId}/>
+                        <div className="widget-content widget-column">
+                            <p>{weatherMain}</p>
+                            <p>{Math.round(temperature)}&#176;</p>
+                        </div>
+                        <span className="widget-bottom-right text-gray">{city}</span>
+                    </ModuleBody>
+                </StyledModuleElement>
+                // </div>
+            );
+            /*
+        }else{
+            
             return(
                 <div className="App-widget Opened" onClick={this.closeWidget}>
-                    <WidgetTitle name="Meteo"/>
+                    <ModuleTitle color="#FFF" name="Meteo"/>
                     <WeatherIcon name="owm" className="weather-icon" iconId="200"/>
                     <div>{Math.round(temperatureMin)}&#176;</div>
                     <div>{Math.round(temperature)}&#176;</div>
@@ -111,19 +145,8 @@ class WeatherModule extends Component {
                     <div>{city}</div>
                 </div>         
             );
-        }else{
-            return (
-                <div className="App-widget App-widget-1-4 widget-meteo" onClick={this.openWidget}>
-                    <WidgetTitle name="Meteo"/>
-                    <WeatherIcon name="owm" className="weather-icon" iconId={iconId}/>
-                    <div className="widget-content widget-column">
-                        <p>{weatherMain}</p>
-                        <p>{Math.round(temperature)}&#176;</p>
-                    </div>
-                    <span className="widget-bottom-right text-gray">{city}</span>
-                </div>
-            );
         }
+        */
 	}
 }
 

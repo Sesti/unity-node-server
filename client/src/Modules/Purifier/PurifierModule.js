@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import WidgetTitle from './WidgetTitle.js';
+import ModuleTitle from '../../ModulesComponents/ModuleTitle';
 import "./PurifierModule.css";
 
 class PurifierModule extends Component {
@@ -30,7 +30,7 @@ class PurifierModule extends Component {
 	render(){
 		return (
 			<div className="App-widget App-widget-1-4 module purifier_mod">
-				<WidgetTitle name="WeMo Purifier"/>
+				<ModuleTitle color="#FFF" name="WeMo Purifier"/>
 				<button onClick={this.activatePurifier} className="on">On</button>
 				<button onClick={this.deactivatePurifier} className="off">Off</button>
 			</div>

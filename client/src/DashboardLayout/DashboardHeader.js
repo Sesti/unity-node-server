@@ -10,6 +10,7 @@ const Header = styled.header`
     display:flex;
     align-items: center;
     justify-content: center;
+    position:relative;
     `
 
 const Title = styled.h1`
@@ -25,15 +26,11 @@ const Title = styled.h1`
 
 class DashboardHeader extends Component{
 
-    constructor(props){
-        super(props);
-    }
-
     render(){
         return (
             <Header>
                 <Title>{this.props.name}</Title>
-                <Settings></Settings>
+                <Settings />
             </Header>
         );
     }

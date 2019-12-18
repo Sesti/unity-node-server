@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import WidgetTitle from './WidgetTitle.js';
+import ModuleTitle from '../../ModulesComponents/ModuleTitle';
 import "./NewsModule.css";
 
 class NewsModule extends Component {
@@ -20,7 +20,7 @@ class NewsModule extends Component {
 	
 	fetchData(){
 		const context = this;
-		fetch( "http://localhost:3005/api/v1/news", {method: 'get'} )
+		fetch( this.props.url + "/api/v1/news", {method: 'get'} )
 			.then( function ( response ){
 				return response.json();
             } )
@@ -64,7 +64,7 @@ class NewsModule extends Component {
 		return (
 			<div className="App-widget App-widget-1-2 widget-news" style={{backgroundImage: 'url('+url+')'}}>
 				<div className="widget-overlay"></div>
-				<WidgetTitle name="News"/>
+				<ModuleTitle color="#FFF" name="News"/>
 				<h3>{title}</h3>
 				<p>{description}</p>
 				<span>{pubDate}</span>
