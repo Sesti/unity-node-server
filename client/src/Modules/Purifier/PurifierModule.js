@@ -24,7 +24,7 @@ class PurifierModule extends Component {
 	}
 	
 	call(name, mode){
-		fetch( "http://localhost:3000/api/domotique/purifier/"+name+"/"+mode, {method: 'post'} )
+		fetch( this.props.url + "/api/domotique/purifier/"+name+"/"+mode, {method: 'post'} )
 	}
 	
 	render(){

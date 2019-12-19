@@ -11,6 +11,7 @@ const weatherUpdateTime = 300000;   // 5 minutes
 const newsUpdateTime = 3600000; // 1 heure
 const weatherUrl = `http://api.openweathermap.org/data/2.5/weather?id=${process.env.WEATHER_CITY_ID}&APPID=${process.env.WEATHER_API_KEY}&units=metric`;
 const newsUrl = 'https://www.journaldemontreal.com/rss.xml';
+const plugUrl = (action) => `https://maker.ifttt.com/trigger/${action}/with/key/${process.env.IFTTT_API_KEY}`;
 
 const app = express();
 
@@ -46,6 +47,20 @@ app.get('/api/v1/news', (req, res) => {
         if (err) throw err;
         res.json(JSON.parse(data));
     });
+});
+
+app.get('/api/v1/domotique/plug/:room/:action', (req,res) => {
+
+    if(req.params.room === "bathroom"){
+        const action = req.params.action == "on" ? "start_plug_bathroom" : "stop_plug_bathroom";
+        axios.post(plugUrl(action))
+        .then((res) => {
+            console.log(chalk.magentaBright(res.data));
+        })
+        .catch((error) => {
+            console.log(chalk.red("Error : " + error));
+        });
+    }
 });
 
 
