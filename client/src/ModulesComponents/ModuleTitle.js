@@ -7,7 +7,7 @@ const Title = styled.h2`
     margin:0;
     color:${props => props.color};
     width:100%;
-    flex: 0 1 100%;
+    flex: ${props => props.flex == "column" ? "0 1 100%" : "0 1 25px"};
     opacity:1;
 `;
 
@@ -15,7 +15,7 @@ export default class ModuleTitle extends Component{
 
     render(){
         return(
-            <Title color={this.props.color}>{this.props.name}</Title>
+            <Title color={this.props.color ? this.props.color : "#FFF"}>{this.props.name}</Title>
         );
     };
 }

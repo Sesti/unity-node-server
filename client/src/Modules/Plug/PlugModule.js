@@ -7,7 +7,6 @@ const StyledModuleElement = styled(ModuleElement)`
     background: #fe8c00;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to top, #f83600, #fe8c00);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to top, #f83600, #fe8c00); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-
     display:block;
 `;
 
@@ -22,15 +21,16 @@ const ModuleBody = ({ children, ...other }) => <StyledBody {...other}>{children}
 
 const Button = styled.button`
     border: 4px solid #FFF;
-    padding: 7px 15px;
+    padding: 11px 20px;
     color: #FFF;
-    font-family: "Lato", sans-serif;
+    font-family: "Lato",sans-serif;
     background: transparent;
     border-radius: 10px;
     margin: 25px 10px;
-    font-weight: bold;
-    font-size: 14px;
+    font-weight: 900;
+    font-size: 19px;
     cursor: pointer;
+    -webkit-transition: 0.3s all ease;
     transition: 0.3s all ease;
 `;
 

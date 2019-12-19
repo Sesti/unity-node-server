@@ -6,6 +6,10 @@ const axios = require('axios');
 const fs = require('fs');
 const chalk = require('chalk');
 var convert = require('xml-js');
+var querystring = require('querystring');
+var request = require('request'); // "Request" library
+var cookieParser = require('cookie-parser');
+var cors = require('cors');
 
 const weatherUpdateTime = 300000;   // 5 minutes
 const newsUpdateTime = 3600000; // 1 heure
@@ -13,7 +17,13 @@ const weatherUrl = `http://api.openweathermap.org/data/2.5/weather?id=${process.
 const newsUrl = 'https://www.journaldemontreal.com/rss.xml';
 const plugUrl = (action) => `https://maker.ifttt.com/trigger/${action}/with/key/${process.env.IFTTT_API_KEY}`;
 
+/* Spotify auth */
+const client_id = `${process.env.SPOTIFY_CLIENT_ID}`;
+const client_secret = `${process.env.SPOTIFY_CLIENT_SECRET}`;
+const redirect_uri =  `${process.env.SPOTIFY_REDIRECT_URI}`;
+
 const app = express();
+
 
 /*************
  * Configure
@@ -63,6 +73,36 @@ app.get('/api/v1/domotique/plug/:room/:action', (req,res) => {
     }
 });
 
+
+// your application requests authorization
+var authOptions = {
+  url: 'https://accounts.spotify.com/api/token',
+  headers: {
+    'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+  },
+  form: {
+    grant_type: 'client_credentials'
+  },
+  json: true
+};
+
+request.post(authOptions, function(error, response, body) {
+  if (!error && response.statusCode === 200) {
+
+    // use the access token to access the Spotify Web API
+    var token = body.access_token;
+    var options = {
+      url: 'https://api.spotify.com/v1/sesti25/player/currently-playing',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      json: true
+    };
+    request.get(options, function(error, response, body) {
+      console.log(body);
+    });
+  }
+});
 
 /***********************
  * Fetchers functions
@@ -141,6 +181,21 @@ fetchWeather();
 fetchNews();
 setInterval(() => fetchWeather , weatherUpdateTime);
 setInterval(() => fetchNews, newsUpdateTime)
+
+/*************
+ * Utility
+ *************/
+var generateRandomString = function (length) {
+    var text = '';
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (var i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+};
+
+var stateKey = 'spotify_auth_state';
 
 /*************
  * Runtime

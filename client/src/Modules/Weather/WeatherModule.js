@@ -138,7 +138,12 @@ class WeatherModule extends Component {
             );
         }else{
             return (
-                <ModuleLoading text="Fetching weather..." />
+                <StyledModuleElement size="1_4">
+                    <ModuleTitle color="#FFF" name="Meteo"/>
+                    <ModuleBody>
+                        <ModuleLoading text="Fetching weather..." />
+                    </ModuleBody>
+                </StyledModuleElement>
             );
         }
         /*
