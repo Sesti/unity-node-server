@@ -1,43 +1,56 @@
 import React, { Component } from 'react';
 import ModuleTitle from '../../ModulesComponents/ModuleTitle';
 import ModuleElement from '../../ModulesComponents/ModuleElement';
-import ModuleBody from '../../ModulesComponents/ModuleBody';
-import WeatherIcon from 'react-icons-weather';
+import Body from '../../ModulesComponents/ModuleBody';
+import ModuleLoading from '../../ModulesComponents/ModuleLoading';
+import ModuleFadeFooter from '../../ModulesComponents/ModuleFadeFooter';
+import WeatherIcon from './WeatherIcon';
 import styled from 'styled-components';
-import "./WeatherModule.css";
 
 const StyledModuleElement = styled(ModuleElement)`
     background: #2193b0;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to bottom, #6dd5ed, #2193b0);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to bottom, #6dd5ed, #2193b0); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
+    display:block;
+`;
+
+const Weather = styled.p`
+    margin:0;
+    color:#FFF;
+    font-family: 'Lato', sans-serif;
+    font-weight:bold;
+    font-size:20px;
+`;
+
+const Temperature = styled(Weather)`
+    font-size:35px;
+`;
+
+const StyledWidgetContent = styled.div`
+    display:flex;
+    justify-content: center;
     align-items: flex-start;
 `;
+const WidgetContent = ({ children, ...other }) => <StyledWidgetContent {...other}>{children}</StyledWidgetContent>;
+
+const StyledBody = styled.div`
+    display:flex;
+    width:100%;
+    justify-content:space-around;
+    align-items:center;
+    margin-top:7px;
+`;
+const ModuleBody = ({ children, ...other }) => <StyledBody {...other}>{children}</StyledBody>;
 
 class WeatherModule extends Component {
 	
 	constructor(props){
 		super( props );
-		this.state = {
-            isOpened: false,
-			data: {
-				temperature : 0,
-				temperatureMin : "",
-                temperatureMax : "",
-                humidity : "",
-                sunrise : "",
-                sunset : "",
-				weatherId : "",
-                weatherIcon : "",
-                weatherDescription : "",
-                weatherMain : "",
-                windDegrees : "",
-                windSpeed : "",
-				city : "",
-			}
+		this.state = { 
+            isOpened: false, 
+            isLoaded: false,
+            data: null
         }
         
         this.closeWidget = this.closeWidget.bind(this);
@@ -45,8 +58,8 @@ class WeatherModule extends Component {
 	}
 	
 	fetchData(){
-		const context = this;
-		fetch( "http://localhost:3005/api/v1/weather", {method: 'get'} )
+        const context = this;
+		fetch( this.props.url + "/api/v1/weather", {method: 'get'} )
 			.then( function ( response ){
 				return response.json();
 			} )
@@ -66,8 +79,10 @@ class WeatherModule extends Component {
                     windSpeed : json.wind.speed,
                     city : json.name,
                 }
-
-				context.setState( {data: obj} );
+                context.setState( {
+                    isLoaded: true,
+                    data: obj
+                } );
 			} );
 	}
 	
@@ -88,44 +103,46 @@ class WeatherModule extends Component {
     }
     
     formatDate(timestamp){
-        const date = new Date(timestamp);
-        
+        const date = new Date(timestamp);        
         return date.getHours() + ":" + date.getMinutes();
     }
 
-    openWidget(){
+    openWidget(){ 
         this.setState({ isOpened: true });
     }
-
 
     closeWidget(){
         this.setState({ isOpened: false });
     }
 	
-	render(){
-        const {temperature, temperatureMin, temperatureMax, humidity, sunrise, sunset, weatherId, weatherIcon, 
-            weatherDescription, weatherMain, windDegrees, windSpeed, city } = this.state.data;
-        const iconId = weatherId === "" ? "200" : weatherId.toString();
-        
-        /*
-        if(!this.state.isOpened){
-            */
+	render(){      
+       
+        if(this.state.isLoaded){
+
+            const {temperature, temperatureMin, temperatureMax, humidity, sunrise, sunset, weatherId, weatherIcon, 
+                    weatherDescription, weatherMain, windDegrees, windSpeed, city } = this.state.data;
+            const iconId = weatherId === "" ? "200" : weatherId.toString();
+
             return (
-                // <div className="App-widget App-widget-1-4 widget-meteo" onClick={this.openWidget}>
                 <StyledModuleElement size="1_4">
                     <ModuleTitle color="#FFF" name="Meteo"/>
                     <ModuleBody>
                         <WeatherIcon name="owm" className="weather-icon" iconId={iconId}/>
-                        <div className="widget-content widget-column">
-                            <p>{weatherMain}</p>
-                            <p>{Math.round(temperature)}&#176;</p>
-                        </div>
-                        <span className="widget-bottom-right text-gray">{city}</span>
+                        <WidgetContent className="widget-content widget-column">
+                            <Temperature>{Math.round(temperature)}&#176;</Temperature>
+                            <Weather>{weatherMain}</Weather>
+                        </WidgetContent>
+                        <ModuleFadeFooter className="widget-bottom-right text-gray">{city}</ModuleFadeFooter>
                     </ModuleBody>
                 </StyledModuleElement>
-                // </div>
             );
-            /*
+        }else{
+            return (
+                <ModuleLoading text="Fetching weather..." />
+            );
+        }
+        /*
+        if(!this.state.isOpened){
         }else{
             
             return(

@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
-const Element = styled.article`
+const StyledModuleElement = styled.article`
     overflow: hidden;
     border-radius: 15px;
     position: relative;
@@ -10,20 +10,14 @@ const Element = styled.article`
     box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.0);
     transition: 0.3s all ease-in-out;
     background: #FFF;
+    padding:1%;
+    overflow:hidden;
     ${props => props.size === "1_4" ? "flex:0 1 24%;" : ""}
     ${props => props.size === "1_3" ? "flex:0 1 32%;" : ""}
     ${props => props.size === "1_2" ? "flex:0 1 49%;" : ""}
     ${props => props.size === "1_1" ? "flex:0 1 100%;" : ""}
 `;
 
-export default class ModuleElement extends Component{
+const ModuleElement = ({ children, ...other}) => <StyledModuleElement {...other}>{children}</StyledModuleElement>
 
-    render(){
-        return(
-            <Element size={this.props.size}>
-                {this.props.children}
-            </Element>
-        );
-    }
-
-}
+export default ModuleElement;
