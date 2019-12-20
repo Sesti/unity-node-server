@@ -143,7 +143,8 @@ app.get('/callback', function (req, res) {
             res.redirect('http://localhost:3000/#' +
                 querystring.stringify({
                     access_token: access_token,
-                    refresh_token: refresh_token
+                    refresh_token: refresh_token,
+                    authorized: 1,
                 }));
         } else {
             res.redirect('localhost:3000/#' +

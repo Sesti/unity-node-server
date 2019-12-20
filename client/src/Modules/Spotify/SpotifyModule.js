@@ -48,11 +48,15 @@ const Button = styled.a`
 export default class SpotifyModule extends Component{
 
     constructor(props){
-        super( props );
-        
+        super( props );        
+
+        let params = this.getHashParams();
+        let isAuthorized = params.authorized ? true : false;
+
 		this.state = { 
             isOpened: false,
             isLoaded: false,
+            isAuthorized: isAuthorized,
             authState: '',
             access_token: '',
             refresh_token: '',
@@ -83,8 +87,9 @@ export default class SpotifyModule extends Component{
         fetch('https://api.spotify.com/v1/me/player/next', init)
             .then(res => {
                 console.log(res);
+                console.log(this);
                 if (res.status === 200) {
-                    return res.json()
+                    return res.json();
                 }else if(res.status === 204) {
                     return;
                 }
@@ -128,55 +133,66 @@ export default class SpotifyModule extends Component{
         return hashParams;
     }
 
-    componentDidMount(){
-        let params = this.getHashParams();
-        let access_token = params.access_token,
-            refresh_token = params.refresh_token,
-            error = params.error;
+    fetchState(){
+        if(this.state.isAuthorized){
+            let params = this.getHashParams();
+            let access_token = params.access_token,
+                refresh_token = params.refresh_token,
+                error = params.error;
 
-        if(access_token) this.setState( {access_token: access_token} );
-        if(refresh_token) this.setState( {refresh_token: refresh_token} );
-        if(error) this.setState( {error: error} );
+            if(access_token) this.setState( {access_token: access_token} );
+            if(refresh_token) this.setState( {refresh_token: refresh_token} );
+            if(error) this.setState( {error: error} );
 
-        let headers = new Headers();
-        headers.append('Authorization', 'Bearer ' + access_token);
-        headers.append('Accept', 'application/json');
-        headers.append('Content-Type', 'application/json');
+            let headers = new Headers();
+            headers.append('Authorization', 'Bearer ' + access_token);
+            headers.append('Accept', 'application/json');
+            headers.append('Content-Type', 'application/json');
 
-        const init = {
-            headers: headers,
-            mode: 'cors'
+            const init = {
+                headers: headers,
+                mode: 'cors'
+            }
+
+            let data = {};
+
+            fetch('https://api.spotify.com/v1/me/player/currently-playing', init)
+                .then(res => {
+                    let data = {};
+
+                    if (res.status === 200) {
+                        return res.json()
+                    } else if (res.status === 204) {
+                        data.currentlyPlaying = false;
+                        return;
+                    } else if (res.status === 401) {
+                        this.setState( {access_token: "", refresh_token: ""} );
+                        return;
+                    }
+                })
+                .then(res => {
+
+                    console.log(res);
+                    data.currentlyPlaying = true;
+                    data.albumImage = res.item.album.images;
+                    data.artists = res.item.artists.map(a => a.name);
+                    data.progress = res.progress_ms;
+                    data.duration = res.item.duration_ms;
+                    data.name = res.item.name;
+                    data.popularity = res.item.popularity;
+                    this.setState( {data : data} );
+                })
+                .catch(err => console.log(err));
         }
+    }
 
-        let data = {};
+    componentDidMount(){
+        this.fetchState();
+        this.timer = setInterval(() => {this.fetchState()}, 3000);
+    }
 
-        fetch('https://api.spotify.com/v1/me/player/currently-playing', init)
-            .then(res => {
-                let data = {};
-
-                if (res.status === 200) {
-                    return res.json()
-                } else if (res.status === 204) {
-                    data.currentlyPlaying = false;
-                    return;
-                } else if (res.status === 401) {
-                    this.setState( {access_token: "", refresh_token: ""} );
-                    return;
-                }
-            })
-            .then(res => {
-
-                console.log(res);
-                data.currentlyPlaying = true;
-                data.albumImage = res.item.album.images;
-                data.artists = res.item.artists.map(a => a.name);
-                data.progress = res.progress_ms;
-                data.duration = res.item.duration_ms;
-                data.name = res.item.name;
-                data.popularity = res.item.popularity;
-                this.setState( {data : data} );
-            })
-            .catch(err => console.log(err));
+    componentWillUnmount(){
+        clearInterval(this.timer);
     }
 
     stringToCssClass(string){
@@ -187,7 +203,17 @@ export default class SpotifyModule extends Component{
 
     render(){
         
-        if(this.state.error){
+        if(!this.state.isAuthorized){            
+            return (
+                <ModuleElement size='1_2'>
+                    <ModuleTitle name="Spotify" flex="column" />
+                    <ModuleBody>
+                        <Button href={this.props.url + "/login"}>Log in to Spotify</Button>
+                    </ModuleBody>
+                </ModuleElement>
+            );
+            
+        }else if(this.state.error){
             return(
                 <ModuleElement size='1_2'>
                     <ModuleTitle name="Spotify" flex="column" />
@@ -196,9 +222,9 @@ export default class SpotifyModule extends Component{
                     </ModuleBody>
                 </ModuleElement>
             );
-        }else if(this.state.access_token){
+        }else{
             
-            if(this.state.data != null && this.state.data.currentlyPlaying){
+            if(this.state.data != null){
                 const {albumImage, name, artists} = this.state.data;
 
                 const artistsDOM = artists.map(a => 
@@ -209,6 +235,7 @@ export default class SpotifyModule extends Component{
                     <ModuleElement size='1_2'>
                         <ModuleTitle name="Spotify" flex="column" />
                         <ModuleBody>
+                            <Text>{this.state.data.currentlyPlaying ? "Playing" : "Paused"}</Text>
                             <img width="100px" height="100px" src={albumImage[1].url} />
                             <Text>{name}</Text>
                             <ul>{artistsDOM}</ul>
@@ -227,15 +254,6 @@ export default class SpotifyModule extends Component{
                     </ModuleElement>
                 );
             }
-        }else{
-            return(
-                <ModuleElement size='1_2'>
-                    <ModuleTitle name="Spotify" flex="column" />
-                    <ModuleBody>
-                        <Button href={this.props.url + "/login"}>Log in to Spotify</Button>
-                    </ModuleBody>
-                </ModuleElement>
-            );
         }
     }
 }
