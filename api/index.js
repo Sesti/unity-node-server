@@ -7,7 +7,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 var convert = require('xml-js');
 var querystring = require('querystring');
-var request = require('request'); // "Request" library
+var request = require('request');
 var cookieParser = require('cookie-parser');
 var cors = require('cors');
 
@@ -73,35 +73,109 @@ app.get('/api/v1/domotique/plug/:room/:action', (req,res) => {
     }
 });
 
+/*
+app.get('/login', function (req, res) {
+    var scopes = 'user-read-private user-read-email';
+    res.redirect('https://accounts.spotify.com/authorize' +
+        '?response_type=code' +
+        '&client_id=' + client_id +
+        (scopes ? '&scope=' + encodeURIComponent(scopes) : '') +
+        '&redirect_uri=' + encodeURIComponent(redirect_uri));
+});
+*/
 
-// your application requests authorization
-var authOptions = {
-  url: 'https://accounts.spotify.com/api/token',
-  headers: {
-    'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
-  },
-  form: {
-    grant_type: 'client_credentials'
-  },
-  json: true
-};
+app.get('/login', function (req, res) {
 
-request.post(authOptions, function(error, response, body) {
-  if (!error && response.statusCode === 200) {
+    //var state = generateRandomString(16);
+    //res.cookie(stateKey, state);
+    console.log(chalk.green("[Spotify] /login called redirecting..."));
+    // your application requests authorization
+    var scope = 'user-read-playback-state user-read-currently-playing user-modify-playback-state';
+    res.redirect('https://accounts.spotify.com/authorize?' +
+        querystring.stringify({
+            response_type: 'code',
+            client_id: client_id,
+            scope: scope,
+            redirect_uri: redirect_uri,
+            //state: state
+        }));
+});
 
-    // use the access token to access the Spotify Web API
-    var token = body.access_token;
-    var options = {
-      url: 'https://api.spotify.com/v1/sesti25/player/currently-playing',
-      headers: {
-        'Authorization': 'Bearer ' + token
-      },
-      json: true
+app.get('/callback', function (req, res) {
+
+    // your application requests refresh and access tokens
+    // after checking the state parameter
+
+    console.log(chalk.green("[Spotify] /callback called"));
+    var code = req.query.code || null;
+    //res.clearCookie(stateKey);
+    var authOptions = {
+        url: 'https://accounts.spotify.com/api/token',
+        form: {
+            code: code,
+            redirect_uri: redirect_uri,
+            grant_type: 'authorization_code'
+        },
+        headers: {
+            'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        },
+        json: true
     };
-    request.get(options, function(error, response, body) {
-      console.log(body);
+
+    request.post(authOptions, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+
+            var access_token = body.access_token,
+                refresh_token = body.refresh_token;
+
+            // var options = {
+            //     url: 'https://api.spotify.com/v1/me/player',
+            //     headers: { 'Authorization': 'Bearer ' + access_token },
+            //     json: true
+            // };
+
+            // // use the access token to access the Spotify Web API
+            // request.get(options, function (error, response, body) {
+            //     console.log("request : ", body);
+            // });
+
+            // we can also pass the token to the browser to make requests from there
+            res.redirect('http://localhost:3000/#' +
+                querystring.stringify({
+                    access_token: access_token,
+                    refresh_token: refresh_token
+                }));
+        } else {
+            res.redirect('localhost:3000/#' +
+                querystring.stringify({
+                    error: 'invalid_token'
+                }));
+        }
     });
-  }
+});
+
+app.get('/refresh_token', function (req, res) {
+
+    // requesting access token from refresh token
+    var refresh_token = req.query.refresh_token;
+    var authOptions = {
+        url: 'https://accounts.spotify.com/api/token',
+        headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+        form: {
+            grant_type: 'refresh_token',
+            refresh_token: refresh_token
+        },
+        json: true
+    };
+
+    request.post(authOptions, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            var access_token = body.access_token;
+            res.send({
+                'access_token': access_token
+            });
+        }
+    });
 });
 
 /***********************
@@ -182,18 +256,25 @@ fetchNews();
 setInterval(() => fetchWeather , weatherUpdateTime);
 setInterval(() => fetchNews, newsUpdateTime)
 
+console.log(chalk.green(`[Spotify] Callback : ${process.env.SPOTIFY_REDIRECT_URI}`));
+
 /*************
  * Utility
  *************/
-var generateRandomString = function (length) {
+/**
+ * Generates a random string containing numbers and letters
+ * @param  {number} length The length of the string
+ * @return {string} The generated string
+ */
+var generateRandomString = function(length) {
     var text = '';
     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
+  
     for (var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
-};
+  };
 
 var stateKey = 'spotify_auth_state';
 

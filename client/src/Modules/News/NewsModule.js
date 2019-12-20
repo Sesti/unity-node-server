@@ -59,7 +59,6 @@ class NewsModule extends Component {
 	render(){
         const {title, url, description, pubDate} = this.state.data;
 		const backgroundStyle = this.state.backgroundStyle;
-		console.log(backgroundStyle);
 		
 		return (
 			<div className="App-widget App-widget-1-2 widget-news" style={{backgroundImage: 'url('+url+')'}}>
